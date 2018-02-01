@@ -1,6 +1,6 @@
 <?php
 
-namespace Module;
+namespace Croissant;
 
 use RuntimeException;
 
@@ -23,14 +23,18 @@ class StringTemplate
         if (is_null($delim_open) || is_null($delim_close)) {
             throw new RuntimeException('invalid delimiter');
         }
+
+        $open_pattern = preg_quote($delim_open);
+        $close_pattern = preg_quote($delim_close);
+        $not_close_pattern = '[^'.preg_quote($delim_close).']*';
         
         $rpc_table = [];
         foreach ($table as $key => $value) {
-            $src = $delim_open.$key.$delim_close;
+            $src = '/'.$open_pattern.$not_close_pattern.preg_quote($key).$not_close_pattern.$close_pattern.'/';
             $rpc_table[$src] = $value;
         }
 
-        return str_replace(array_keys($rpc_table), $table, $template);
+        return preg_replace(array_keys($rpc_table), $table, $template);
     }
         
 }
